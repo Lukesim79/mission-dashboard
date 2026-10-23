@@ -1,13 +1,28 @@
-import { fetchAll } from "@/lib/data";
 import Dashboard from "@/components/Dashboard";
+import { analyze, loadCore } from "@/lib/analysis";
 export const revalidate = 600;
+
 export default async function Home() {
-  const [customers, units, consultations, contracts, ads] = await Promise.all([
-    fetchAll("customers", "customer_id,grade,lead_source"),
-    fetchAll("units", "unit_id,type,status,price_10k_krw"),
-    fetchAll("consultations", "consult_id,consultant,channel,consult_date,outcome,is_future,duration_min"),
-    fetchAll("contracts", "contract_id,customer_id,contract_date,price_10k_krw,status,sales_rep,is_future"),
-    fetchAll("ad_spend"),
-  ]);
-  return <Dashboard {...{ customers, units, consultations, contracts, ads }} />;
+  const core = await loadCore();
+  const a = analyze(core);
+  const lead = Object.fromEntries(core.customers.map((c) => [c.customer_id, c]));
+  const recent = core.contracts
+    .filter((c) => !c.is_future)
+    .sort((x, y) => (x.contract_date < y.contract_date ? 1 : -1))
+    .slice(0, 10)
+    .map((c) => ({ ...c, customer: lead[c.customer_id]?.name ?? "–", lead_source: lead[c.customer_id]?.lead_source ?? "–" }));
+  return (
+    <Dashboard
+      customers={core.customers.map((c) => ({ customer_id: c.customer_id, lead_source: c.lead_source }))}
+      units={core.units.map((u) => ({ unit_id: u.unit_id, type: u.type, status: u.status }))}
+      consultations={core.consultations.map((c) => ({ consultant: c.consultant, consult_date: c.consult_date, outcome: c.outcome, is_future: c.is_future }))}
+      contracts={core.contracts.map((c) => ({ customer_id: c.customer_id, contract_date: c.contract_date, price_10k_krw: c.price_10k_krw, status: c.status, is_future: c.is_future }))}
+      ads={core.ads}
+      recent={recent}
+      alerts={a.alerts}
+      funnel={a.funnel}
+      insights={a.insights}
+      highlight={a.highlight}
+    />
+  );
 }

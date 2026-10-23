@@ -4,7 +4,7 @@ import { isAdmin, logout } from "./actions";
 export const dynamic = "force-dynamic";
 
 export default async function Admin() {
-  if (!(await isAdmin())) return (<><h1>관리자</h1><LoginForm /></>);
+  if (!(await isAdmin())) return (<><div className="page-h"><h1>관리자</h1></div><LoginForm /></>);
   const [k, t, c] = await Promise.all([
     fetchAll<any>("consultations", "consult_id,customer_id,unit_id,duration_raw,duration_flag,orphan_customer,orphan_unit,is_future"),
     fetchAll<any>("contracts", "contract_id,price_zero_flag,loan_missing,unit_multi_contract,is_future"),
@@ -27,12 +27,12 @@ export default async function Admin() {
   const orphans = k.filter((x) => x.orphan_customer || x.orphan_unit).slice(0, 30);
   return (
     <>
-      <h1>관리자 · 데이터 품질 현황</h1>
+      <div className="page-h"><h1>관리자 · 데이터 품질 현황</h1></div>
       <form action={logout}><button className="pri">로그아웃</button></form>
-      <h2>플래그된 이상치 건수</h2>
-      <div className="card scroll"><table><thead><tr><th>테이블</th><th>항목</th><th>건수</th></tr></thead><tbody>{rows.map((r) => (<tr key={r[0] + r[1]}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td></tr>))}</tbody></table></div>
-      <h2>고아 참조 상담 (상위 30건)</h2>
-      <div className="card scroll"><table><thead><tr><th>consult_id</th><th>customer_id</th><th>unit_id</th></tr></thead><tbody>{orphans.map((o) => (<tr key={o.consult_id}><td>{o.consult_id}</td><td className={o.orphan_customer ? "warn" : ""}>{o.customer_id}</td><td className={o.orphan_unit ? "warn" : ""}>{o.unit_id}</td></tr>))}</tbody></table></div>
+      <h2 style={{ marginTop: 16 }}>플래그된 이상치 건수</h2>
+      <div className="card pad0 scroll"><table><thead><tr><th>테이블</th><th>항목</th><th>건수</th></tr></thead><tbody>{rows.map((r) => (<tr key={r[0] + r[1]}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td></tr>))}</tbody></table></div>
+      <h2 style={{ marginTop: 16 }}>고아 참조 상담 (상위 30건)</h2>
+      <div className="card pad0 scroll"><table><thead><tr><th>consult_id</th><th>customer_id</th><th>unit_id</th></tr></thead><tbody>{orphans.map((o) => (<tr key={o.consult_id}><td>{o.consult_id}</td><td className={o.orphan_customer ? "warn" : ""}>{o.customer_id}</td><td className={o.orphan_unit ? "warn" : ""}>{o.unit_id}</td></tr>))}</tbody></table></div>
     </>
   );
 }
