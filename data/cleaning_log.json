@@ -1,0 +1,219 @@
+[
+ {
+  "table": "customers",
+  "issue": "전화번호 포맷 3종(010-0000-0000 / 01000000000 / 010.0000.0000)",
+  "action": "숫자 11자리로 통일",
+  "rows": 612,
+  "reason": ""
+ },
+ {
+  "table": "customers",
+  "issue": "등급 표기 불일치(VIP/vip/Vip, '일반 ', ' 일반')",
+  "action": "공백 제거 + VIP 대소문자 통일 (VVIP·관심고객·신규는 별개 등급으로 유지)",
+  "rows": 178,
+  "reason": "VVIP는 VIP와 다른 등급일 수 있어 병합하지 않음"
+ },
+ {
+  "table": "customers",
+  "issue": "유입경로 표기(블로그/Blog, 광고/광고(네이버))",
+  "action": "블로그로 통일, 광고(네이버)→광고",
+  "rows": 125,
+  "reason": "네이버 구분은 하위분류라 광고로 합침(세부 구분이 필요하면 raw 참조)"
+ },
+ {
+  "table": "customers",
+  "issue": "지역 표기 불일치(서울/Seoul/seoul/서울시 등)",
+  "action": "17개 시도 약칭으로 통일",
+  "rows": 37,
+  "reason": ""
+ },
+ {
+  "table": "customers",
+  "issue": "예산 이상치(-1, 999999)",
+  "action": "NULL 처리 + budget_outlier=true (평균 계산에서 제외)",
+  "rows": 129,
+  "reason": "센티널 값이라 실제 예산이 아님. 중앙값으로 대체하지 않음(왜곡 방지)"
+ },
+ {
+  "table": "customers",
+  "issue": "signup_date 날짜 포맷 4종 혼재 (9999-99-99:476, 9999/99/99:60, 99999999:58, 99-99-9999:54)",
+  "action": "ISO(YYYY-MM-DD)로 통일",
+  "rows": 172,
+  "reason": "NN-NN-YYYY는 두 번째 값이 12 초과인 경우가 있고 첫 값은 없어 MM-DD-YYYY로 해석"
+ },
+ {
+  "table": "customers",
+  "issue": "signup_date가 기준일(2026-10-23) 이후 미래 날짜",
+  "action": "삭제하지 않고 is_future 플래그만 부여",
+  "rows": 36,
+  "reason": "합성 데이터가 2026-12까지 생성됨. 시계열 추이 차트는 기준일까지만 사용"
+ },
+ {
+  "table": "customers",
+  "issue": "이메일 결측",
+  "action": "NULL 유지(임의 값 채우지 않음)",
+  "rows": 38,
+  "reason": ""
+ },
+ {
+  "table": "customers",
+  "issue": "전화 결측",
+  "action": "NULL 유지",
+  "rows": 36,
+  "reason": ""
+ },
+ {
+  "table": "customers",
+  "issue": "중복 고객 행 (같은 customer_id가 여러 행, 48개 ID)",
+  "action": "customer_id당 1행 유지(결측이 적은 행 우선, 동률이면 먼저 나온 행)",
+  "rows": 48,
+  "reason": "name+phone으로도 ID 간 중복 없음 확인. 중복 행끼리 다른 건 전화번호 포맷/번호뿐"
+ },
+ {
+  "table": "customers",
+  "issue": "중복 행끼리 전화번호 값이 서로 다름",
+  "action": "유지한 번호는 phone, 다른 번호는 phone_alt에 보존",
+  "rows": 22,
+  "reason": "어느 번호가 맞는지 판단 근거 없음 → 삭제하지 않고 보존"
+ },
+ {
+  "table": "customers",
+  "issue": "정리 결과",
+  "action": "648행 → 600행",
+  "rows": 600,
+  "reason": ""
+ },
+ {
+  "table": "units",
+  "issue": "정합성 검증",
+  "action": "unit_id 유일, 값 변환만 수행",
+  "rows": 220,
+  "reason": "수정 없음(마스터)"
+ },
+ {
+  "table": "consultations",
+  "issue": "consult_date 날짜 포맷 4종 혼재 (9999-99-99:1863, 99-99-9999:214, 9999/99/99:212, 99999999:211)",
+  "action": "ISO(YYYY-MM-DD)로 통일",
+  "rows": 637,
+  "reason": "NN-NN-YYYY는 두 번째 값이 12 초과인 경우가 있고 첫 값은 없어 MM-DD-YYYY로 해석"
+ },
+ {
+  "table": "consultations",
+  "issue": "consult_date가 기준일(2026-10-23) 이후 미래 날짜",
+  "action": "삭제하지 않고 is_future 플래그만 부여",
+  "rows": 161,
+  "reason": "합성 데이터가 2026-12까지 생성됨. 시계열 추이 차트는 기준일까지만 사용"
+ },
+ {
+  "table": "consultations",
+  "issue": "채널 표기 불일치(전화/phone/Phone, 방문/방문상담, 끝 공백)",
+  "action": "전화·방문·SNS·온라인 4종으로 통일",
+  "rows": 953,
+  "reason": ""
+ },
+ {
+  "table": "consultations",
+  "issue": "outcome 끝 공백('계약희망 ')",
+  "action": "공백 제거",
+  "rows": 501,
+  "reason": ""
+ },
+ {
+  "table": "consultations",
+  "issue": "상담시간 음수/0",
+  "action": "NULL + duration_flag=invalid (원본은 duration_raw)",
+  "rows": 493,
+  "reason": "상담시간은 양수여야 함"
+ },
+ {
+  "table": "consultations",
+  "issue": "상담시간 240분",
+  "action": "NULL + duration_flag=cap240",
+  "rows": 225,
+  "reason": "전체의 약 9%가 정확히 240 → 입력 상한값 의심. 평균 상담시간 계산에서 제외"
+ },
+ {
+  "table": "consultations",
+  "issue": "마스터에 없는 customer_id (C99xxx 등)",
+  "action": "삭제하지 않고 orphan_customer=true 플래그",
+  "rows": 74,
+  "reason": "고객 단위 분석에서만 제외, 채널·상담 건수 집계는 유지"
+ },
+ {
+  "table": "consultations",
+  "issue": "마스터에 없는 unit_id",
+  "action": "orphan_unit=true 플래그",
+  "rows": 83,
+  "reason": "호실 단위 분석에서만 제외"
+ },
+ {
+  "table": "consultations",
+  "issue": "정리 결과",
+  "action": "2500행 → 2500행 (행 삭제 없음)",
+  "rows": 2500,
+  "reason": ""
+ },
+ {
+  "table": "contracts",
+  "issue": "상태 표기 불일치(완료/complete/Completed, 끝 공백)",
+  "action": "완료·진행중·해지 3종으로 통일",
+  "rows": 81,
+  "reason": ""
+ },
+ {
+  "table": "contracts",
+  "issue": "contract_date 날짜 포맷 4종 혼재 (9999-99-99:254, 99999999:42, 99-99-9999:28, 9999/99/99:26)",
+  "action": "ISO(YYYY-MM-DD)로 통일",
+  "rows": 96,
+  "reason": "NN-NN-YYYY는 두 번째 값이 12 초과인 경우가 있고 첫 값은 없어 MM-DD-YYYY로 해석"
+ },
+ {
+  "table": "contracts",
+  "issue": "contract_date가 기준일(2026-10-23) 이후 미래 날짜",
+  "action": "삭제하지 않고 is_future 플래그만 부여",
+  "rows": 20,
+  "reason": "합성 데이터가 2026-12까지 생성됨. 시계열 추이 차트는 기준일까지만 사용"
+ },
+ {
+  "table": "contracts",
+  "issue": "분양가 0원 (계약금·대출도 0)",
+  "action": "가격·계약금·대출 NULL + price_zero_flag=true",
+  "rows": 4,
+  "reason": "units 가격으로 대체하지 않음: 계약 금액이 호실가의 약 12%(7~30%)라 같은 척도가 아님"
+ },
+ {
+  "table": "contracts",
+  "issue": "대출금액 결측",
+  "action": "NULL 유지 + loan_missing=true (0원으로 간주하지 않음)",
+  "rows": 40,
+  "reason": "현금 결제인지 미입력인지 구분 불가"
+ },
+ {
+  "table": "contracts",
+  "issue": "동일 unit_id에 계약 여러 건 (호실 1개에 최대 4건)",
+  "action": "삭제하지 않고 unit_multi_contract 플래그. 호실 단위 분석 시 해지 제외·최신 1건 사용",
+  "rows": 224,
+  "reason": "합성 데이터 특성. units.status(계약완료 103호)와도 불일치하므로 호실 상태는 units, 매출은 contracts로 분리 집계"
+ },
+ {
+  "table": "contracts",
+  "issue": "마스터 참조 정합성",
+  "action": "customer_id/unit_id 모두 존재 확인",
+  "rows": 0,
+  "reason": "고아 0건"
+ },
+ {
+  "table": "contracts",
+  "issue": "정리 결과",
+  "action": "350행 → 350행 (행 삭제 없음)",
+  "rows": 350,
+  "reason": ""
+ },
+ {
+  "table": "ad_spend",
+  "issue": "정합성 검증 (월×채널 유일, clicks≤impressions, leads≤clicks)",
+  "action": "수정 없음",
+  "rows": 144,
+  "reason": ""
+ }
+]
