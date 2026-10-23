@@ -28,7 +28,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     <>
       <header className="top">
         <Link href="/" className="brand"><span className="logo">B</span>분양 CRM</Link>
-        <div className="user"><i>김</i><span>김 팀장 · 분양 영업팀</span></div>
+        <div className="user"><i>5</i><span>5조 전팀장과 심팀장들, 마케팅팀</span></div>
       </header>
       <div className="shell">
         <nav className="side" aria-label="메뉴">
